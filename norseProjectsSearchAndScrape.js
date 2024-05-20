@@ -26,7 +26,7 @@ const getQuotes = async (name, type) => {
     await page.click('.icon-btn.search-btn');
 
     await page.waitForSelector('.inner.bar-inner');
-    await page.type('input[name="search"]', 'Aros short');
+    await page.type('input[name="search"]', name);
     await page.keyboard.press('Enter');
 
     await page.waitForSelector('.row > .item > a');
@@ -61,6 +61,7 @@ const getQuotes = async (name, type) => {
         if(index > 0){
             page.waitForSelector('div[class~="SelectInput"] > .options');
             page.click(`div[class~="SelectInput"] > .options > .option:nth-child(${index})`);
+            page.waitForSelector('.SelectInput > .options');
         }
          const variantData = page.evaluate((variant, type) => {
             const product = {
@@ -72,7 +73,14 @@ const getQuotes = async (name, type) => {
                 Vendor: "Norse Projects",
                 status: "draft",
                 Published: false,
-            };    
+                sizes: [],
+            };
+          const selectInputs = document.querySelectorAll(".SelectInput > .options");
+          const inputsArray = Array.from(selectInputs);
+          const optionItems = inputsArray[1].querySelectorAll("[class~='option']");
+          Array.from(optionItems).map((option) => {
+            product.sizes.push(option.innerText);
+          });
     
             // Fetch the first element with class "quote"
             // Get the displayed text and returns it
